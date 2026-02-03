@@ -7,33 +7,32 @@ const JWT_SECRET = process.env.JWT_SECRET || "secret-key";
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    const user = await prisma.user.findUnique({
-      where: { username },
+    const admin = await prisma.admin.findUnique({
+      where: { email },
     });
 
-    if (!user) {
+    if (!admin) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid password" });
     }
 
-    const token = jwt.sign(
-      { id: user.id, username: user.username },
-      JWT_SECRET,
-      { expiresIn: "8h" },
-    );
+    const token = jwt.sign({ id: admin.id, email: admin.email }, JWT_SECRET, {
+      expiresIn: "8h",
+    });
 
     return res.json({
       message: "Login success",
       token,
       user: {
-        id: user.id,
-        username: user.username,
+        id: admin.id,
+        email: admin.email,
+        name: admin.name,
       },
     });
   } catch (error) {

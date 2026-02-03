@@ -2,7 +2,7 @@ import { prisma } from "../prismaClient";
 
 export async function createParticipant(payload: {
   employee_id: string;
-  full_name: string;
+  fullName: string;
   department: string;
   dietary: string;
   remark?: string;
@@ -15,7 +15,7 @@ export async function createParticipant(payload: {
   const p = await prisma.participant.create({
     data: {
       employeeId,
-      full_name: payload.full_name || payload.fullName,
+      fullName: payload.fullName || (payload as any).full_name,
       department: payload.department,
       dietary: payload.dietary,
       remark: payload.remark,
@@ -82,7 +82,7 @@ export async function bulkCreateParticipants(
     EmployeeID?: string;
     employeeId?: string;
     Name?: string;
-    full_name?: string;
+    fullName?: string;
     full_name?: string;
     Department?: string;
     department?: string;
@@ -100,11 +100,11 @@ export async function bulkCreateParticipants(
     try {
       // Support multiple field name formats from Excel
       const employeeId = item.EmployeeID || item.employeeId || "";
-      const full_name = item.Name || item.fullName || item.full_name || "";
+      const fullName = item.Name || item.fullName || item.full_name || "";
       const department = item.Department || item.department || "";
       const dietary = item.Dietary || item.dietary || "";
 
-      if (!employeeId || !full_name) {
+      if (!employeeId || !fullName) {
         results.errors.push(
           `Missing required fields for: ${JSON.stringify(item)}`,
         );
@@ -126,7 +126,7 @@ export async function bulkCreateParticipants(
       await prisma.participant.create({
         data: {
           employeeId,
-          full_name,
+          fullName,
           department,
           dietary: dietary === "None" ? null : dietary,
         },
@@ -145,7 +145,7 @@ export async function bulkCreateParticipants(
 export async function updateParticipant(
   id: string,
   payload: {
-    full_name?: string;
+    fullName?: string;
     department?: string;
     dietary?: string;
     remark?: string;
