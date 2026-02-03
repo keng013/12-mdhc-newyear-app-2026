@@ -90,4 +90,3 @@ volumes:
 networks:
   default:
     name: mdhc-network
-      "http://localhost:4001",
