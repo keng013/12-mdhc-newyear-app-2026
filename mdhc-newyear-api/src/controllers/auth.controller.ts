@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../prismaClient";
+import { prisma } from "../prismaClient";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -25,7 +25,7 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { id: user.id, username: user.username },
       JWT_SECRET,
-      { expiresIn: "8h" }
+      { expiresIn: "8h" },
     );
 
     return res.json({
@@ -34,7 +34,7 @@ export const login = async (req: Request, res: Response) => {
       user: {
         id: user.id,
         username: user.username,
-      }
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -44,12 +44,12 @@ export const login = async (req: Request, res: Response) => {
 
 export const me = async (req: any, res: Response) => {
   return res.json({
-    user: req.user
+    user: req.user,
   });
 };
 
 export const refreshToken = async (req: Request, res: Response) => {
   return res.json({
-    message: "Refresh token feature coming soon"
+    message: "Refresh token feature coming soon",
   });
 };
