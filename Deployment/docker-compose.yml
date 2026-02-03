@@ -26,13 +26,15 @@ services:
     container_name: mdhc-backend
     environment:
       DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-mdhc_newyear}
-      JWT_SECRET: ${JWT_SECRET}
-      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+    expose:
+      - "4001"
+    ports:
+      - "4001:4001"
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       PORT: 4000
       NODE_ENV: production
     ports:
-      - "4000:4000"
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4001"]
     depends_on:
       postgres:
         condition: service_healthy
