@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+}
+
+model Participant {
+  id           String   @id @default(uuid())
+  employeeId   String   @unique
+  fullName     String
+  department   String
+  dietary      String?
+  remark       String?
+  avatarUrl    String?
+  registeredAt DateTime @default(now())
+  checkedIn    Boolean   @default(false)
+  checkedInAt  DateTime?
+  
+  luckyDraws LuckyDrawResult[]
+  @@index([employeeId])
+}
+
+model Prize {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  category    PrizeCategory
+  stock       Int
+  remaining   Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  luckyDraws LuckyDrawResult[]
+}
+
+model LuckyDrawResult {
+  id            String   @id @default(uuid())
+  participant   Participant @relation(fields: [participantId], references: [id])
+  participantId String
+  prize         Prize       @relation(fields: [prizeId], references: [id])
+  prizeId       String
+  isRedraw      Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+}
+
+enum PrizeCategory {
+  SMALL
+  MEDIUM
+  BIG
+  GRAND
+}
