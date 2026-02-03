@@ -16,6 +16,9 @@ RUN npm run build
 FROM node:18-alpine
 WORKDIR /app
 
+# Ensure common network tools available for healthchecks
+RUN apk add --no-cache wget
+
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
