@@ -311,3 +311,12 @@ For issues or questions:
 1. Check logs: `docker-compose logs -f`
 2. Review this README
 3. Contact system administrator
+
+ngrok http 8080 --host-header="127.0.0.1:8080"
+
+docker-compose -f Deployment/docker-compose.yml up -d --build
+docker compose -f Deployment/docker-compose.yml up -d --no-deps --build frontend
+
+# or, if already built:
+
+docker compose -f Deployment/docker-compose.yml restart frontend

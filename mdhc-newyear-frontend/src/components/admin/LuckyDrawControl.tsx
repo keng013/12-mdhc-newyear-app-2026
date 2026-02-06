@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import {
   Play,
@@ -55,12 +55,12 @@ export function LuckyDrawControl({ onOpenProjector }: LuckyDrawControlProps) {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isDrawing, setIsDrawing] = useState(false);
 
-  // Audio elements
-  const audioRefs = {
-    draw: new Audio("/sounds/draw.mp3"),
-    winner: new Audio("/sounds/winner.mp3"),
-    click: new Audio("/sounds/click.mp3"),
-  };
+  // Audio elements (lazy init and stable ref)
+  const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({
+    draw: null,
+    winner: null,
+    click: null,
+  });
 
   // Confirmation modals
   const [showRedrawConfirm, setShowRedrawConfirm] = useState(false);
@@ -87,10 +87,22 @@ export function LuckyDrawControl({ onOpenProjector }: LuckyDrawControlProps) {
   const playSound = (type: "draw" | "winner" | "click") => {
     if (!soundEnabled) return;
     try {
-      audioRefs[type].currentTime = 0;
-      audioRefs[type]
-        .play()
-        .catch((err) => console.log("Audio play failed:", err));
+      let audio = audioRefs.current[type];
+      if (!audio) {
+        // Respect Vite base URL (app may be served under a subpath)
+        const base = (import.meta as any).env?.BASE_URL || "/";
+        const src = `${base.replace(/\/$/, "")}/sounds/${type}.mp3`;
+        audio = new Audio(src);
+        audio.preload = "auto";
+        audioRefs.current[type] = audio;
+      }
+      audio.currentTime = 0;
+      const p = audio.play();
+      if (p && typeof (p as any).catch === "function") {
+        (p as Promise<void>).catch((err) =>
+          console.log("Audio play failed:", err),
+        );
+      }
     } catch (error) {
       console.log("Sound error:", error);
     }

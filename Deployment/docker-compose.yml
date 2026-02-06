@@ -66,6 +66,10 @@ services:
     container_name: mdhc-frontend
     expose:
       - "4001"
+    # Expose only to internal Docker network. Public access handled by external reverse proxy (TLS terminator).
+    # Bind the frontend port to localhost on the host so the host-level reverse proxy
+    # (openresty/nginx) can reach it via 127.0.0.1:4001 while keeping it inaccessible
+    # from external interfaces.
     ports:
       - "4001:4001"
     depends_on:
@@ -79,7 +83,7 @@ services:
           "--quiet",
           "--tries=1",
           "--spider",
-          "http://localhost:4001",
+          "http://localhost:4001/newyear2026/",
         ]
       interval: 30s
       timeout: 10s
